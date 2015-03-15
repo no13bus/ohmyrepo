@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div id="asks">
+  <h3>This is content body!</h3>
+  {% for item in asks %}
+  <div class="ask">
+    <div class="title"><a href="/ask/{{ item.id }}">{{ item.title|e }}</a></div>
+    <div class="info">{{ item.user|user_name_tag }} 发布关于 {{ item.tags|tags_name_tag(2) }} 的问题于 {{ item.created_at|strftime }}, {{ item.answers_count }} 个回答</div>
+    <div class="body">
+<!--       {{ item.body|truncate_lines }} -->
+    </div>
+  </div>
+  {% endfor %}
+  {% if asks|length == 10 %}
+  <a class="page_more" href="/?last={{ asks[-1].id }}">查看更多...</a>
+  {% endif %}
+</div>
+{% endblock %}
+
+
+{% block sidebar %}
+<h3>This is sidebar!</h3>
+{% if current_user %}
+<div class="box">
+  {{ current_user|avatar(120) }}
+</div>
+{% endif %}
+{% endblock %}

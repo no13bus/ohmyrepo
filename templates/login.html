@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block body %}
+<div id="login" class="form">
+  {{ notice_message }}
+  <form action="/login" method="post">
+    <div class="row">
+      <label>用户名:</label><br />
+      <input type="text" name="login" class="text" value="" />
+    </div>
+    <div class="row">
+      <label>密码:</label><br />
+      <input type="password" class="text" name="password" />
+    </div>
+    <div class="action">
+      <button type="submit">登陆</button>
+    </div>
+    {{ xsrf_form_html() }}
+  </form>
+</div>
+{% endblock %}
