@@ -16,6 +16,14 @@
   <a class="page_more" href="/?last={{ asks[-1].id }}">查看更多...</a>
   {% endif %}
 </div>
+<div>
+    <form action="" method="POST">
+        {{ xsrf_form_html() }}
+        <input type="text" name="webhook"/>
+        <input type="submit" value="Webhook" />
+    </form>
+
+</div>
 {% endblock %}
 
 
@@ -23,7 +31,8 @@
 <h3>This is sidebar!</h3>
 {% if current_user %}
 <div class="box">
-  {{ current_user|avatar(120) }}
+  {{ current_user }}
+    <img src="{{ avatar_url }}" alt=""/>
 </div>
 {% endif %}
 {% endblock %}

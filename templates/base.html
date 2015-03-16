@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="{{ static_url("css/flat-ui.css") }}" type="text/css" />
   <link rel="stylesheet" href="{{ static_url("css/app.css") }}" type="text/css" />
    {% block styles %}{% endblock %} 
-   <script type="text/javascript" src="{{ static_url("js/jquery.js") }}"></script>
+   <script type="text/javascript" src="http://cdn.bootcss.com/jquery/2.1.3/jquery.js"></script>
    {% block scripts %}{% endblock %} 
 </head>
 <body>
@@ -23,14 +23,14 @@
           <li><a href="{{ giturl }}">Github登陆</a></li>
           <li><a href="/register">注册</a></li>
           {% else %}
-          <li>{{ current_user|user_name_tag }} </li>
-          <li><a href="/settings">个人设置</a></li>
+          <li><a href="/settings">{{ current_user }}</a></li>
           <li><a href="/logout">退出</a></li>
           {% endif %}
         </ul>
       </div>
     </div>
   </div>
+
 
   <div id="main" class="container">
     <div class="row">
