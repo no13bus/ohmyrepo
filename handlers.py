@@ -3,7 +3,7 @@ import sys
 import tornado.web
 import tornado.auth
 from tornado import gen
-from tornado.web import asynchronous
+
 import requests
 from jinja2 import Template, Environment, FileSystemLoader
 from bson.objectid import ObjectId
