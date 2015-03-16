@@ -4,20 +4,26 @@ import tornado.web
 import tornado.auth
 from tornado import gen
 from tornado.web import asynchronous
+from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 import requests
 from jinja2 import Template, Environment, FileSystemLoader
 from bson.objectid import ObjectId
+import simplejson
 
 import filter, utils, session
 from forms import *
 # from models import *
 from settings import githubapi
 from libs.githubpy import GitHub
+import json
+from tornado.httputil import url_concat
 
-gh = GitHub(client_id=githubapi['CLIENT_ID'], client_secret=githubapi['CLIENT_SECRET'],
-            redirect_uri=githubapi['REDIRECT_URL'], scope='read:repo_hook,write:repo_hook,user:follow')
-giturl = gh.authorize_url(state=githubapi['STATE'])
+# gh = GitHub(client_id=githubapi['CLIENT_ID'], client_secret=githubapi['CLIENT_SECRET'],
+#             redirect_uri=githubapi['REDIRECT_URL'], scope='read:repo_hook,write:repo_hook,user:follow')
+# giturl = gh.authorize_url(state=githubapi['STATE'])
+# giturl = '/callback'
 
+AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
 
 class BaseHandler(tornado.web.RequestHandler):
 
@@ -88,7 +94,7 @@ class BaseHandler(tornado.web.RequestHandler):
 class HomeHandler(BaseHandler):
     # @tornado.web.authenticated
     def get(self):
-        # giturl = 'https://github.com/login/oauth/authorize?scope=read:repo_hook,write:repo_hook,user:follow&state=a-random-string&redirect_uri=http://127.0.0.1:8888/callback&client_id=ba0466e711d7acc1e6b7'
+        giturl = 'https://github.com/login/oauth/authorize?scope=read:repo_hook,write:repo_hook,user:follow&state=a-random-string&redirect_uri=http://127.0.0.1:8888/callback&client_id=ba0466e711d7acc1e6b7'
         self.render("home.html", giturl=giturl)
 
 class LogoutHandler(BaseHandler):
@@ -97,35 +103,46 @@ class LogoutHandler(BaseHandler):
         self.set_secure_cookie("user_id","")
         self.redirect("/login")
 
-
 class LoginHandler(BaseHandler):
+    @gen.coroutine
     def get(self):
         code = self.get_argument('code')
-        # state = self.get_argument('state')
-        # if githubapi['STATE'] != state:
-        #     self.redirect("/error")
+        print code
+        client = AsyncHTTPClient()
+        # https://api.github.com/users/no13bus
         params = {
             'client_id': githubapi['CLIENT_ID'],
             'redirect_uri': githubapi['REDIRECT_URL'],
             'client_secret': githubapi['CLIENT_SECRET'],
             'code': code
         }
-        headers = {'Accept': 'application/json'}
-        r = requests.post(githubapi['ACCESS_TOKEN_URL'], params=params, headers=headers, verify=True)
-        token = r.json()['access_token']
-        def user_callback(result, error):
-            pass
-        self.db.user.insert(user, callback=user_callback)
-        # print token
-        # for i in range(2000):
-        #     result = yield self.db.test_collection.insert({'i': i})
-        #     print result
-        # self.finish()
-        # self.db.user
-        # user = User.objects(login=frm.login, password=password).first()
+        url = url_concat("https://github.com/login/oauth/access_token", params)
+        req = HTTPRequest(url=url, method="POST",headers={"Accept": "application/json"}, body='')
+        res = yield client.fetch(req)
+        resp_json = json.loads(res.body)
+        token = resp_json['access_token']
+        req_url = url_concat("https://api.github.com/user", {'access_token': token})
+        req_user = HTTPRequest(url=req_url, method="GET")
+        res_user = yield client.fetch(req_user)
 
-        # self.set_title(u"登陆")
-        # self.redirect("/")
+        user_info = json.loads(res_user.body)
+        print user_info
+        name = user_info['login']
+        # if User.objects.filter(name=name).count() < 1:
+        #     form = UserForm(initial={
+        #         'name': name,
+        #         'avatar_url': user_info['avatar_url'],
+        #         'email': user_info['email'] if 'email' in user_info else ''
+        #     })
+
+        # request.session['user'] = name
+        # request.session['user_id'] = user_id
+        # request.session['user_avatar'] = user_info['avatar_url']
+
+        self.write('ooooo')
+        # self.db.user.insert({})
+        # self.set_secure_cookie("user_id",str(user.id))
+        # self.redirect('/')
 
     def post(self):
         self.set_title(u"登陆")
