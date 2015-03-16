@@ -128,6 +128,12 @@ class LoginHandler(BaseHandler):
         user_info = json.loads(res_user.body)
         print user_info
         name = user_info['login']
+        if yield self.db.find({'username':name}):
+            pass
+        yield self.db.user.insert({'username':name, 'token':token})
+        self.set_secure_cookie("user_id",str(user.id))
+        self.set_secure_cookie("username",name)
+        self.set_secure_cookie("user_avatar",name)
         # if User.objects.filter(name=name).count() < 1:
         #     form = UserForm(initial={
         #         'name': name,
