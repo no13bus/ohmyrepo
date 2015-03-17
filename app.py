@@ -30,6 +30,7 @@ class Application(tornado.web.Application):
             (r"/callback", LoginHandler),
             (r"/register", RegisterHandler),
             (r"/logout", LogoutHandler),
+            (r"/webhook", WebhookHandler)
         ]
         self.session_manager = session.TornadoSessionManager(settings["session_secret"], settings["session_dir"])
         tornado.web.Application.__init__(self, handlers, **settings)

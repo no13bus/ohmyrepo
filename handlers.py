@@ -86,6 +86,15 @@ class BaseHandler(tornado.web.RequestHandler):
     def set_title(self, str):
         self._title = u"%s - %s" % (str,self.settings['app_name'])
 
+class WebhookHandler(BaseHandler):
+    # @tornado.web.authenticated
+    def get(self):
+        pass
+
+    def post(self):
+        print self.get_argument('action')
+        self.write('ooooo')
+
 class HomeHandler(BaseHandler):
     # @tornado.web.authenticated
     def get(self):
