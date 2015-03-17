@@ -3,13 +3,14 @@ import sys
 import tornado.web
 import tornado.auth
 from tornado import gen
-from tornado.web import asynchronous
+from tornado.web import asynchronous, HTTPError, _time_independent_equals
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
+from tornado.escape import utf8, _unicode
 import requests
 from jinja2 import Template, Environment, FileSystemLoader
 from bson.objectid import ObjectId
 import simplejson
-
+from dateutil import parser
 import filter, utils, session
 from forms import *
 # from models import *
@@ -87,39 +88,58 @@ class BaseHandler(tornado.web.RequestHandler):
         self._title = u"%s - %s" % (str,self.settings['app_name'])
 
     def check_xsrf_cookie(self):
-        token = (self.get_argument("_xsrf", None) or
-                 self.request.headers.get("X-Xsrftoken") or
-                 self.request.headers.get("X-Csrftoken"))
+        # token = (self.get_argument("_xsrf", None) or
+        #          self.request.headers.get("X-Xsrftoken") or
+        #          self.request.headers.get("X-Csrftoken"))
         header = self.request.headers
         # print header
         if not 'GitHub-Hookshot' in header['User-Agent']:
-            if not token:
-                raise HTTPError(403, "'_xsrf' argument missing from POST")
-            _, token, _ = self._decode_xsrf_token(token)
-            _, expected_token, _ = self._get_raw_xsrf_token()
-            if not _time_independent_equals(utf8(token), utf8(expected_token)):
-                raise HTTPError(403, "XSRF cookie does not match POST argument")
+            super(BaseHandler, self).check_xsrf_cookie()
+            # if not token:
+            #     raise HTTPError(403, "'_xsrf' argument missing from POST")
+            # _, token, _ = self._decode_xsrf_token(token)
+            # _, expected_token, _ = self._get_raw_xsrf_token()
+            # if not _time_independent_equals(utf8(token), utf8(expected_token)):
+            #     raise HTTPError(403, "XSRF cookie does not match POST argument")
 
 class WebhookHandler(BaseHandler):
     # @tornado.web.authenticated
     def get(self):
         pass
 
+    @gen.coroutine
     def post(self):
         res = self.request.body
         # print res
         res_json = json.loads(res)
         # only star fork will triger this webhook!!!! watch(may be can not get by webhook) do not!
-        if 'action' in res_json:
+        if 'action' in res_json and res_json['action'] == 'started':
+            username, reponame = res_json['repository']['full_name'].split('/')
+            if username != self.get_secure_cookie('username'):
+                self.redirect('/')
             print res_json['action'], res_json['repository']['full_name'], res_json['sender']['login'], res_json['sender']['avatar_url']
-            # handle all the stars, forks, watchs which the repo have before
-            # client = AsyncHTTPClient()
-            # req = HTTPRequest(url=req_url_hook, method="PATCH", body=json.dumps(data))
-            # all_hooks_resp = yield client.fetch(req_url)
-            # all_hooks_json = json.loads(all_hooks_resp.body)
-            # hook_res = [i['id'] for i in all_hooks_json if i['config']['url']==webhook]
-        elif 'forkee' in res_json:
-            print res_json['forkee']['full_name'], res_json['sender']['login'], res_json['sender']['avatar_url']
+            repo_bool = yield self.db.event.find({'username':username, 'reponame':reponame})
+            if repo_bool:
+                client = AsyncHTTPClient()
+                sender_info = yield client.fetch('https://api.github.com/users/%s?access_token=%s' % (res_json['sender']['login'], self.get_secure_cookie('token')))
+                sender_info_json = json.loads(sender_info.body)
+                sender = {
+                    'followers': sender_info_json['followers'],
+                    'username': res_json['sender']['login'],
+                    'avatar_url': sender_info_json['avatar_url'],
+                    'location': sender_info_json['location']
+                    }
+                yield self.db.event.insert({
+                    'star_count': res_json['repository']['stargazers_count'],
+                    'reponame':reponame,
+                    'sender': sender,
+                    'time': parser.parse(res_json['repository']['updated_at'])
+                })
+            else:
+                pass
+
+        # elif 'forkee' in res_json:
+        #     print res_json['forkee']['full_name'], res_json['sender']['login'], res_json['sender']['avatar_url']
         self.write('oooppp')
 
 class HomeHandler(BaseHandler):
@@ -172,7 +192,7 @@ class HomeHandler(BaseHandler):
             req = HTTPRequest(url=req_url, method="POST", body=json.dumps(data))
             res = yield client.fetch(req)
 
-        print res.body
+        # print res.body
 
         self.write('pppp')
 
