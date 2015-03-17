@@ -92,6 +92,7 @@ class WebhookHandler(BaseHandler):
         pass
 
     def post(self):
+        print self.request.body
         print self.get_argument('action')
         self.write('ooooo')
 
