@@ -86,22 +86,48 @@ class BaseHandler(tornado.web.RequestHandler):
     def set_title(self, str):
         self._title = u"%s - %s" % (str,self.settings['app_name'])
 
+    def check_xsrf_cookie(self):
+        token = (self.get_argument("_xsrf", None) or
+                 self.request.headers.get("X-Xsrftoken") or
+                 self.request.headers.get("X-Csrftoken"))
+        header = self.request.headers
+        # print header
+        if not 'GitHub-Hookshot' in header['User-Agent']:
+            if not token:
+                raise HTTPError(403, "'_xsrf' argument missing from POST")
+            _, token, _ = self._decode_xsrf_token(token)
+            _, expected_token, _ = self._get_raw_xsrf_token()
+            if not _time_independent_equals(utf8(token), utf8(expected_token)):
+                raise HTTPError(403, "XSRF cookie does not match POST argument")
+
 class WebhookHandler(BaseHandler):
     # @tornado.web.authenticated
     def get(self):
         pass
 
     def post(self):
-        print self.request.body
-        print self.get_argument('action')
-        self.write('ooooo')
+        res = self.request.body
+        # print res
+        res_json = json.loads(res)
+        # only star fork will triger this webhook!!!! watch(may be can not get by webhook) do not!
+        if 'action' in res_json:
+            print res_json['action'], res_json['repository']['full_name'], res_json['sender']['login'], res_json['sender']['avatar_url']
+            # handle all the stars, forks, watchs which the repo have before
+            # client = AsyncHTTPClient()
+            # req = HTTPRequest(url=req_url_hook, method="PATCH", body=json.dumps(data))
+            # all_hooks_resp = yield client.fetch(req_url)
+            # all_hooks_json = json.loads(all_hooks_resp.body)
+            # hook_res = [i['id'] for i in all_hooks_json if i['config']['url']==webhook]
+        elif 'forkee' in res_json:
+            print res_json['forkee']['full_name'], res_json['sender']['login'], res_json['sender']['avatar_url']
+        self.write('oooppp')
 
 class HomeHandler(BaseHandler):
     # @tornado.web.authenticated
     def get(self):
         # current_user = self.get_current_user()
         avatar_url = self.get_secure_cookie('avatar_url')
-        giturl = 'https://github.com/login/oauth/authorize?scope=read:repo_hook,write:repo_hook,user:follow&state=a-random-string&redirect_uri=http://127.0.0.1:8888/callback&client_id=ba0466e711d7acc1e6b7'
+        giturl = 'https://github.com/login/oauth/authorize?scope=read:repo_hook,write:repo_hook,user:follow&state=a-random-string&redirect_uri=http://106.186.117.185:8888/callback&client_id=ba0466e711d7acc1e6b7'
         self.render("home.html", giturl=giturl, avatar_url=avatar_url)
 
     @gen.coroutine
@@ -136,10 +162,7 @@ class HomeHandler(BaseHandler):
                 "name": "web",
                 "active": True,
                 "events": [
-                "push",
-                "pull_request",
-                "watch",
-                "fork"
+                    "*"
                 ],
                 "config": {
                 "url": webhook,
