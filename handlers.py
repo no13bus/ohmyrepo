@@ -119,8 +119,8 @@ class WebhookHandler(BaseHandler):
                 self.redirect('/')
             print res_json['action'], res_json['repository']['full_name'], res_json['sender']['login'], res_json['sender']['avatar_url']
             repo_bool = yield self.db.event.find({'username':username, 'reponame':reponame})
+            client = AsyncHTTPClient()
             if repo_bool:
-                client = AsyncHTTPClient()
                 sender_info = yield client.fetch('https://api.github.com/users/%s?access_token=%s' % (res_json['sender']['login'], self.get_secure_cookie('token')))
                 sender_info_json = json.loads(sender_info.body)
                 sender = {
@@ -136,8 +136,11 @@ class WebhookHandler(BaseHandler):
                     'time': parser.parse(res_json['repository']['updated_at'])
                 })
             else:
+                stars_user_url = 'https://api.github.com/repos/no13bus/redispapa/stargazers?page=1&per_page=100'
                 stars_num = res_json['repository']['stargazers_count']
-                # https://api.github.com/repos/no13bus/redispapa/stargazers
+                star_info = yield client.fetch(stars_user_url)
+                
+                #
 
         # elif 'forkee' in res_json:
         #     print res_json['forkee']['full_name'], res_json['sender']['login'], res_json['sender']['avatar_url']
