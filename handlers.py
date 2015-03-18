@@ -136,7 +136,8 @@ class WebhookHandler(BaseHandler):
                     'time': parser.parse(res_json['repository']['updated_at'])
                 })
             else:
-                pass
+                stars_num = res_json['repository']['stargazers_count']
+                # https://api.github.com/repos/no13bus/redispapa/stargazers
 
         # elif 'forkee' in res_json:
         #     print res_json['forkee']['full_name'], res_json['sender']['login'], res_json['sender']['avatar_url']
