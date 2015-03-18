@@ -1,15 +1,17 @@
 # coding: utf-8
 import sys
+import tornado
 import tornado.web
 import tornado.auth
 from tornado import gen
-from tornado.web import asynchronous
+from tornado.web import asynchronous, HTTPError
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
+from tornado.escape import utf8, _unicode
 import requests
 from jinja2 import Template, Environment, FileSystemLoader
 from bson.objectid import ObjectId
 import simplejson
-
+from dateutil import parser
 import filter, utils, session
 from forms import *
 # from models import *
@@ -86,23 +88,135 @@ class BaseHandler(tornado.web.RequestHandler):
     def set_title(self, str):
         self._title = u"%s - %s" % (str,self.settings['app_name'])
 
+
 # http://www.geonames.org/
+    def check_xsrf_cookie(self):
+        # token = (self.get_argument("_xsrf", None) or
+        #          self.request.headers.get("X-Xsrftoken") or
+        #          self.request.headers.get("X-Csrftoken"))
+        header = self.request.headers
+        # print header
+        if not 'GitHub-Hookshot' in header['User-Agent']:
+            super(BaseHandler, self).check_xsrf_cookie()
+            # if not token:
+            #     raise HTTPError(403, "'_xsrf' argument missing from POST")
+            # _, token, _ = self._decode_xsrf_token(token)
+            # _, expected_token, _ = self._get_raw_xsrf_token()
+            # if not _time_independent_equals(utf8(token), utf8(expected_token)):
+            #     raise HTTPError(403, "XSRF cookie does not match POST argument")
 class WebhookHandler(BaseHandler):
     # @tornado.web.authenticated
     def get(self):
         pass
 
+    @gen.coroutine
     def post(self):
-        print self.request.body
-        print self.get_argument('action')
-        self.write('ooooo')
+        res = self.request.body
+
+        # print res
+        res_json = json.loads(res)
+
+        # only star fork will triger this webhook!!!! watch(may be can not get by webhook) do not!
+        if 'action' in res_json and res_json['action'] == 'started':
+            username, reponame = res_json['repository']['full_name'].split('/')
+            if username != self.get_secure_cookie('username'):
+                pass
+                # self.redirect('/') # gen.coroutine can not support redirect!!!! wtf
+            print res_json['action'], res_json['repository']['full_name'], res_json['sender']['login'], res_json['sender']['avatar_url']
+            user = yield self.db.user.find_one({'username':username})
+            if user:
+                token = user['token']
+            else:
+                token = None
+                self.write('no token')
+
+            repo_bool = yield self.db.event.find_one({'username':username, 'reponame':reponame})
+            client = AsyncHTTPClient()
+            if repo_bool:
+                sender_info = yield client.fetch('https://api.github.com/users/%s?access_token=%s' % (res_json['sender']['login'], token))
+                sender_info_json = json.loads(sender_info.body)
+                sender = {
+                    'followers': sender_info_json['followers'],
+                    'sender_name': res_json['sender']['login'],
+                    'avatar_url': sender_info_json['avatar_url'],
+                    'location': sender_info_json['location'] if 'location' in sender_info_json else ""
+                    }
+                yield self.db.event.insert({
+                    'username': username,
+                    'reponame':reponame,
+                    'sender': sender,
+                    'star_count': res_json['repository']['stargazers_count'],
+                    'time': parser.parse(res_json['repository']['updated_at'])
+                })
+                print 'book false'
+            else:
+                stars_user_url = 'https://api.github.com/repos/no13bus/redispapa/stargazers?page=%s&per_page=100&access_token=%s'
+                stars_num = res_json['repository']['stargazers_count'] # it's important
+                page_num = (stars_num / 100 + 2) if stars_num % 100 else (stars_num / 100 + 1)
+                for x in xrange(1,page_num):
+                    star_info = yield client.fetch(stars_user_url % (x, token))
+                    star_info_json = json.loads(star_info.body)
+                    for one in star_info_json:
+                        one_user_url = 'https://api.github.com/users/%s?access_token=%s' % (one['login'] ,token)
+                        sender_info = yield client.fetch(one_user_url)
+                        sender_info_json = json.loads(sender_info.body)
+                        print sender_info_json
+                        sender = {
+                            'followers': sender_info_json['followers'],
+                            'sender_name': one['login'],
+                            'avatar_url': sender_info_json['avatar_url'],
+                            'location': sender_info_json['location'] if 'location' in sender_info_json else ""
+                            }
+                        yield self.db.event.insert({
+                            'username': username,
+                            'reponame':reponame,
+                            'sender': sender # here is no time
+                        })
+                # event_user_url = 'https://api.github.com/repos/no13bus/redispapa/events?page=%s&per_page=100&access_token=%s'
+                # next_bool = True
+                # i = 1
+                # while next_bool:
+                #     print event_user_url % (i, token)
+                #     event_info = yield client.fetch(event_user_url % (i, token))
+                #     event_info_json = json.loads(event_info.body)
+                #     if not event_info_json:
+                #         next_bool = False
+                #     for one in event_info_json:
+                #         if one['type'] == 'WatchEvent':
+                #             one_user_url = 'https://api.github.com/users/%s?access_token=%s' % (one['actor']['login'] ,token)
+                #             print one_user_url
+                #             sender_info = yield client.fetch(one_user_url, raise_error=False) # no argument raise_error why?
+                #             print type(sender_info.code)
+                #             print sender_info.code
+                #             print sender_info.body
+                #             print '**********'
+                #             sender_info_json = json.loads(sender_info.body)
+                #             sender = {
+                #                 'followers': sender_info_json['followers'],
+                #                 'sender_name': one['actor']['login'],
+                #                 'avatar_url': sender_info_json['avatar_url'],
+                #                 'location': sender_info_json['location'] if 'location' in sender_info_json else ""
+                #             }
+                #             yield self.db.event.insert({
+                #                 'username': username,
+                #                 'reponame':reponame,
+                #                 'sender': sender, # here is no time
+                #                 'time': parser.parse(one['created_at'])
+                #             })
+                #     i = i + 1
+                #     print event_user_url % (i, token)
+                print 'book true'
+
+        # elif 'forkee' in res_json:
+        #     print res_json['forkee']['full_name'], res_json['sender']['login'], res_json['sender']['avatar_url']
+        self.write('oooppp')
 
 class HomeHandler(BaseHandler):
     # @tornado.web.authenticated
     def get(self):
         # current_user = self.get_current_user()
         avatar_url = self.get_secure_cookie('avatar_url')
-        giturl = 'https://github.com/login/oauth/authorize?scope=read:repo_hook,write:repo_hook,user:follow&state=a-random-string&redirect_uri=http://127.0.0.1:8888/callback&client_id=ba0466e711d7acc1e6b7'
+        giturl = 'https://github.com/login/oauth/authorize?scope=read:repo_hook,write:repo_hook,user:follow&state=a-random-string&redirect_uri=http://106.186.117.185:8888/callback&client_id=ba0466e711d7acc1e6b7'
         self.render("home.html", giturl=giturl, avatar_url=avatar_url)
 
     @gen.coroutine
@@ -137,10 +251,7 @@ class HomeHandler(BaseHandler):
                 "name": "web",
                 "active": True,
                 "events": [
-                "push",
-                "pull_request",
-                "watch",
-                "fork"
+                    "*"
                 ],
                 "config": {
                 "url": webhook,
@@ -150,7 +261,7 @@ class HomeHandler(BaseHandler):
             req = HTTPRequest(url=req_url, method="POST", body=json.dumps(data))
             res = yield client.fetch(req)
 
-        print res.body
+        # print res.body
 
         self.write('pppp')
 
