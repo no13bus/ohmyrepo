@@ -25,6 +25,7 @@ http://ohmyrepo.ml
 - 首先，你需要使用github账户登录网站，ohmyrepo需要你的权限包括: follow read, follow write, webhook read, webhook write.
 - 然后你在 [ohmyrepo.ml](http://ohmyrepo.ml) 添加你的github的项目地址, 我们会将该项目的webhook_url设置为 `http://ohmyrepo.ml/webhook`, 然后初始化数据库，爬取该项目以前的star记录.
 - 最后，如果有人之后star了你的项目，利用github的webhook功能，它会自动推送给我们star的详细信息，然后我们将其记录到数据库中。
+- 你可以使用`[![repo](http://ohmyrepo.ml/static/ohmyrepo.png)](http://ohmyrepo.ml/show?u=no13bus&r=redispapa)` 这样的格式放到你的项目中的README页面里面，直接点击可以看到显示效果。例子: [![repo](http://ohmyrepo.ml/static/ohmyrepo.png)](http://ohmyrepo.ml/show?u=no13bus&r=redispapa)
 - 我们使用 [motor](https://github.com/mongodb/motor) 作为 mongodb 的 tornado 异步客户端.
 - 我们使用redis 作为 tornado 的缓存. 多谢 [cloverstd's](https://github.com/cloverstd) 的[项目](https://gist.github.com/cloverstd/10712505).
 
