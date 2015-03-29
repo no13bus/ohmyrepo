@@ -1,38 +1,146 @@
-# coding: utf-8
-import hashlib, uuid
-def truncate_lines(body, lines = 4, max_chars = 400):
-    if not body: return ""
-    body_lines = body.splitlines()
-    summary = "\n".join(body_lines[0:lines])
-    return summary
-    summary = _truncate_lines(body_lines, lines - 1, summary, max_chars)
-    return summary
+#coding: utf-8
+from tornado.httpclient import AsyncHTTPClient, HTTPError, HTTPRequest
+from tornado import gen
+import json
+from dateutil import parser
+import logging
+from libs.geoname import get_geo_name
 
-def _truncate_lines(body_lines, lines, summary, max_chars):
-    if len(summary) > max_chars:
-        lines -= 1
-        if lines > 1:
-            body_lines = body_lines[0:lines]
-            summary = "\n".join(body_lines)
-            return _truncate_lines(body_lines, lines, summary, max_chars)
-        else:
-            summary = body_lines[0][0:max_chars]
-            return summary
+# logger = logging.getLogger()
+# hdlr = logging.FileHandler(logfile)
+# formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+# hdlr.setFormatter(formatter)
+# logger.addHandler(hdlr)
+# logger.setLevel(logging.ERROR)
+
+AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
+
+@gen.coroutine
+def webhook_init(username, reponame, client, token, db):
+    event_user_url = 'https://api.github.com/repos/%s/%s/events?page=%s&per_page=100&access_token=%s'
+    i = 1
+    while True:
+        event_info = yield client.fetch(event_user_url % (username, reponame, i, token), raise_error=False)
+        if event_info.code != 200:
+            print 'it is done!'
+            break
+        print 'ooop'
+        event_info_json = json.loads(event_info.body)
+        for one in event_info_json:
+            if one['type'] == 'WatchEvent':
+                one_user_url = 'https://api.github.com/users/%s?access_token=%s' % (one['actor']['login'] ,token)
+                print one_user_url
+                sender_info = yield client.fetch(one_user_url, raise_error=False)
+                if sender_info.code != 200:
+                    print 'it can not get this user infomation: %s!' % one['actor']['login']
+                    continue
+                sender_info_json = json.loads(sender_info.body)
+                if 'location' in sender_info_json and sender_info_json['location']:
+                    location = yield get_geo_name(sender_info_json['location'])
+                    if not location:
+                        print 'it can not get location by geonames.org!'
+                        continue
+                    city = location['city']
+                    country = location['country']
+                    location_str = sender_info_json['location']
+                    countrycode = location['countrycode']
+                    company = sender_info_json['company']
+                else:
+                    city = ''
+                    country = ''
+                    location_str = ''
+                    countrycode = ''
+                    company = ''
+                print 'location: %s' % city
+                sender = {
+                    'followers': sender_info_json['followers'],
+                    'sender_name': one['actor']['login'],
+                    'avatar_url': sender_info_json['avatar_url'],
+                    'public_repos': sender_info_json['public_repos'],
+                    'city': city,
+                    'country': country,
+                    'location': location_str,
+                    'countrycode': countrycode,
+                    'company': company
+                }
+                yield db.event.insert({
+                    'username': username,
+                    'reponame':reponame,
+                    'sender': sender,
+                    'time': parser.parse(one['created_at'])
+                })
+        i = i + 1
+    raise gen.Return(True)
+
+@gen.coroutine
+def add_webhook(username, reponame, client, token, webhook):
+    req_url = "https://api.github.com/repos/%s/%s/hooks?access_token=%s" % (username, reponame, token)
+    all_hooks_resp = yield client.fetch(req_url, raise_error=False)
+    print all_hooks_resp.code
+    if all_hooks_resp.code != 200:
+        print '11111111'
+        raise gen.Return(False)
+    all_hooks_json = json.loads(all_hooks_resp.body)
+    hook_res = [i['id'] for i in all_hooks_json if i['config']['url']==webhook]
+    if not hook_res:
+        data = {
+            "name": "web",
+            "active": True,
+            "events": [
+                "watch",
+                "fork"
+            ],
+            "config": {
+                "url": webhook,
+                "content_type": "json"
+            }
+        }
+        req = HTTPRequest(url=req_url, method="POST", body=json.dumps(data))
+        res = yield client.fetch(req, raise_error=False)
+        print res.code
+        if res.code != 200:
+            print 'errrrrrr'
+            raise gen.Return(False)
+    raise gen.Return(True)
+
+@gen.coroutine
+def add_webhook_event(username, repo_json, reponame, client, token, db):
+    sender_info = yield client.fetch('https://api.github.com/users/%s?access_token=%s' % (repo_json['sender']['login'], token), raise_error=False)
+    if sender_info.code != 200:
+        raise gen.Return(False)
+    sender_info_json = json.loads(sender_info.body)
+    if 'location' in sender_info_json and sender_info_json['location']:
+        location = yield get_geo_name(sender_info_json['location'])
+        if not location:
+            raise gen.Return(False)
+        city = location['city']
+        country = location['country']
+        countrycode = location['countrycode']
+        location_str = sender_info_json['location']
+        company = sender_info_json['company']
     else:
-        return summary
-
-def md5(str):
-    m = hashlib.md5()
-    m.update(str)
-    return m.hexdigest()
-
-def format_tags(str):
-    str = str.replace(u"，",",")
-    tags = str.split(",")
-    tags = map(lambda tag: tag.strip(), tags)
-    tags = filter(lambda tag: len(tag) > 0, tags)
-    tags = list(set(tags))
-    return tags
-
-def sid():
-    return uuid.uuid1().hex
+        city = ''
+        country = ''
+        location_str = ''
+        countrycode = ''
+        company= ''
+    print 'city:%s' % city
+    sender = {
+        'followers': sender_info_json['followers'],
+        'sender_name': repo_json['sender']['login'],
+        'avatar_url': sender_info_json['avatar_url'],
+        'public_repos': sender_info_json['avatar_url'],
+        'city': city,
+        'country': country,
+        'countrycode': countrycode,
+        'location': location_str,
+        'company': company
+        }
+    insert_res = yield db.event.insert({
+        'username': username,
+        'reponame':reponame,
+        'sender': sender,
+        'star_count': repo_json['repository']['stargazers_count'],
+        'time': parser.parse(repo_json['repository']['updated_at'])
+    })
+    raise gen.Return(insert_res)

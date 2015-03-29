@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+    {% if error_msg %}
+        <div style="margin: 50px 100px 30px;text-align:center;" class="alert alert-dismissible alert-warning">
+              <button type="button" class="close" data-dismiss="alert">×</button>
+              <h1>{{ error_msg }}</h1>
+        </div>
+
+    {% end %}
+    <div class="row" style="margin: 200px 300px 30px;text-align:center;">
+            <form action="" method="POST" role="form">
+                {% module xsrf_form_html() %}
+                <div class="form-group">
+                  <label class="control-label">Input your github repo url</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control" name="webhook_url" placeholder="e.g.: https://github.com/no13bus/ohmyrepo">
+                    <span class="input-group-btn">
+                      <button class="btn btn-primary" type="submit">Add</button>
+                    </span>
+                  </div>
+                </div>
+            </form>
+    </div>
+
+{% end %}

@@ -1,38 +1,29 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block body %}
 
-{% block body %}
-<div id="asks">
-  <h3>This is content body!</h3>
-  {% for item in asks %}
-  <div class="ask">
-    <div class="title"><a href="/ask/{{ item.id }}">{{ item.title|e }}</a></div>
-    <div class="info">{{ item.user|user_name_tag }} 发布关于 {{ item.tags|tags_name_tag(2) }} 的问题于 {{ item.created_at|strftime }}, {{ item.answers_count }} 个回答</div>
-    <div class="body">
-<!--       {{ item.body|truncate_lines }} -->
-    </div>
-  </div>
-  {% endfor %}
-  {% if asks|length == 10 %}
-  <a class="page_more" href="/?last={{ asks[-1].id }}">查看更多...</a>
-  {% endif %}
+<div class="row">
+    {% if repos %}
+    <h1 style="text-align:center;margin:60px 50px 30px;">Your repo list</h1>
+    <ul class="fa-ul" style="margin: 0 auto;font-size: 30px; width: 100px;">
+            {% for repo in repos %}
+            <li><i class="fa-li fa fa-book fa-lg"></i><a href="{{ repo['url'] }}">{{ repo['reponame'] }}</a></li>
+            {% end %}
+    </ul>
+    {% end %}
+
+    {% if error_msg %}
+        <div style="margin: 50px 100px 30px;text-align:center;" class="alert alert-dismissible alert-warning">
+              <button type="button" class="close" data-dismiss="alert">×</button>
+              <h1>{{ error_msg }}</h1>
+        </div>
+        <div style="margin: 200px 300px 30px;text-align:center;">
+           <a href="/add" class='btn btn-info btn-lg' role='button'>
+                <i class='fa fa-github-alt'></i> Add Now
+           </a>
+        </div>
+
+    {% end %}
+
+
 </div>
-<div>
-    <form action="" method="POST">
-        {{ xsrf_form_html() }}
-        <input type="text" name="webhook"/>
-        <input type="submit" value="Webhook" />
-    </form>
 
-</div>
-{% endblock %}
-
-
-{% block sidebar %}
-<h3>This is sidebar!</h3>
-{% if current_user %}
-<div class="box">
-  {{ current_user }}
-    <img src="{{ avatar_url }}" alt=""/>
-</div>
-{% endif %}
-{% endblock %}
+{% end %}

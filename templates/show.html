@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="row">
+        {% if not error_msg and not flash %}
+            <div id="star_chart" style="width:700px;margin:0px auto 20px;"></div>
+            <div id="city_chart" style="width:700px;margin:0px auto 40px;"></div>
+            <h4 style="text-align: center;">Followers' Rank</h4>
+            <table id="follow_chart" class="table table-striped table-condensed" style="width:700px;margin: 0px auto 40px;text-align: center;font-size: 20px;">
+                <tr>
+                    <td>Rank</td>
+                    <td>User</td>
+                    <td>Followers</td>
+                    <td>Follow&nbsp;Now</td>
+                </tr>
+            </table>
+        {% elif flash %}
+            <div style="margin: 200px 100px 30px;text-align:center;" class="alert alert-dismissible alert-info">
+              <button type="button" class="close" data-dismiss="alert">×</button>
+              <h1>{{ flash }}</h1>
+            </div>
+        {% elif error_msg %}
+            <div style="margin: 200px 100px 30px;text-align:center;" class="alert alert-dismissible alert-warning">
+              <button type="button" class="close" data-dismiss="alert">×</button>
+              <h1>{% raw error_msg %}</h1>
+            </div>
+        {% end %}
+
+ </div>
+{% end %}
+
+
+{% block scripts %}
+    <script type="application/javascript" src="http://cdn.bootcss.com/highcharts/4.1.4/highcharts.js"></script>
+    <script type="application/javascript" src="http://code.highcharts.com/maps/modules/map.js"></script>
+    <script src="http://code.highcharts.com/mapdata/custom/world.js"></script>
+    {% if not error_msg and not flash %}
+    <script type="application/javascript">
+        $(function () {
+                Highcharts.setOptions({
+                    global: {
+                        useUTC: false
+                    }
+                });
+
+                var chart = new Highcharts.Chart({
+                    chart: {
+                        type: 'line',
+                        width: 700,
+                        renderTo: 'star_chart'
+                    },
+                    title: {
+                        text: 'Stars'
+                    },
+                    subtitle: {
+                        text: 'show the total star number in a single day of your repo'
+                    },
+                    xAxis: {
+                        type: 'datetime',
+                        title: {
+                            text: 'Time'
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Star Number'
+                        },
+
+                    },
+                    tooltip: {
+                        headerFormat: '<b>{series.name}</b><br>',
+
+                        pointFormat: 'time: {point.x:%Y-%m-%e} <br> num: {point.y}'
+                    },
+
+                    series: [{
+                        name: 'Star Number'
+                    }]
+                });
+
+
+                var stars_data=[];
+                var cities_data=[];
+                var follows_data = [];
+                function getForm(){
+
+                    $.ajax({
+                        url: "{% raw stars_url %}",
+                        dataType:"json",
+                        async:false,
+                        success:function(point){
+                      var obj=eval(point);
+                      if (obj['status'] == 1) {
+                          for (var i=0; i<obj['result'].length; i++){
+                            stars_data.push({x:Date.parse(obj['result'][i]['_id']),y:parseFloat(obj['result'][i]['num'])});
+                          }
+                      }else{
+                          $('#star_chart').hide();
+                      }
+                    },
+                        error: function(){alert('Show stars map error!')}
+                    });
+                    chart.series[0].setData(stars_data);
+
+                    $.ajax({
+                        url: "{% raw cities_url %}",
+                        dataType:"json",
+                        async:false,
+                        success:function(point){
+                      var obj=eval(point);
+                      if (obj['status'] == 1) {
+                          for (var i=0; i<obj['result'].length; i++){
+                            cities_data.push({code:obj['result'][i]['_id'], value:obj['result'][i]['num']});
+                          }
+                      }else{
+                          $('#city_chart').hide();
+                      }
+                    },
+                        error: function(){alert('Show cities error!')}
+                    });
+
+                    $.ajax({
+                        url: "{% raw follows_url %}",
+                        dataType:"json",
+                        async:false,
+                        success:function(point){
+                      var obj=eval(point);
+                      if (obj['status'] == 1) {
+                          /// 添加table和tr td
+                          for (var i=0; i<obj['result'].length; i++){
+                              var $tr = $("<tr></tr>");
+                              var $td = $("<td>" + (i+1) + "</td>")
+                              var $td1 = $("<td><a target='_blank' href='https://github.com/" + obj['result'][i]['sender_name'] + "'>" +"<img src='" + obj['result'][i]['avatar_url'] + "' style='width: 50px; height:50px; border-radius: 10px;' title='" + obj['result'][i]['sender_name'] + "'/></a></td>");
+                              var $td2 = $("<td>" + obj['result'][i]['followers'] + "</td>");
+                              var $td3 = $("<td><a name=" + obj['result'][i]['sender_name'] +" id='follow' href='/f?u=" + obj['result'][i]['sender_name'] + "' class='btn btn-info btn-md' role='button'><i class='fa fa-github-alt'></i>Follow</a></td>");
+                              $tr.append($td);
+                              $tr.append($td1);
+                              $tr.append($td2);
+                              $tr.append($td3);
+                              $("#follow_chart").append($tr);
+                          }
+
+                      }else{
+                          $('#follow_chart').hide();
+                      }
+                    },
+                        error: function(){alert('Show followers error!')}
+                    });
+
+
+                }
+                getForm();
+                $('a#follow').each(function(i){
+                    $(this).click(function(){
+                            var $that = $(this);
+                            var f_url = $that.attr("href");
+                            $.ajax({
+                                url: f_url,
+                                dataType:"json",
+                                async:false,
+                                success:function(resp) {
+                                    var obj=eval(resp);
+                                    console.log(obj);
+                                    if (obj['status'] == 1){
+                                        if ($that.text() == 'Unfollow'){
+                                            $that.attr("href", "/f?u="+$that.attr("name"));
+                                            $that.attr("class", "btn btn-info btn-md");
+                                            $that.html("<i class='fa fa-github-alt'></i>Follow");
+                                        }else{
+                                            $that.attr("href", "/uf?u="+$that.attr("name"));
+                                            $that.attr("class", "btn btn-default btn-md");
+                                            $that.html("<i class='fa fa-github-alt'></i>Unfollow");
+                                        }
+                                    }else{
+                                        alert('follow faiture!');
+                                    }
+                                },
+                                error: function(XMLHttpRequest, textStatus, errorThrown){
+                                   alert("You should login first or maybe there are some errors in the server.")
+
+                                }
+                            });
+                            return false;
+                        }
+                    );
+
+
+                });
+
+
+
+                $('#city_chart').highcharts('Map', {
+                        chart : {
+                            type: 'map',
+                            width: 700
+                        },
+                        title : {
+                            text : 'Repo\'s Followers'
+                        },
+                        subtitle : {
+                            text : 'show the githuber distribution who stared your repo'
+                        },
+                        mapNavigation: {
+                            enabled: true,
+                            buttonOptions: {
+                                verticalAlign: 'bottom'
+                            }
+                        },
+
+                        colorAxis: {
+                            min: 0,
+                            stops: [
+                                [0, '#EFEFFF'],
+                                [0.5, Highcharts.getOptions().colors[0]],
+                                [1, Highcharts.Color(Highcharts.getOptions().colors[0]).brighten(-0.5).get()]
+                            ]
+                        },
+                        series : [{
+                            name: 'Follows',
+                            mapData: Highcharts.maps['custom/world'],
+                            data: cities_data,
+                            states: {
+                                hover: {
+                                    borderWidth: 1
+                                }
+                            },
+                            joinBy: ['iso-a2', 'code'],
+                            tooltip: {
+                                valueSuffix: ''
+                            }
+                        }]
+                    });
+
+    });
+    </script>
+{% end %}
+{% end %}

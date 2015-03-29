@@ -1,0 +1,49 @@
+{% extends "base.html" %} {% block body %}
+<div class="container" style="font-size: 20px;">
+    <div class="row">
+        <div class="col-xs-12 col-sm-offset-1 col-sm-10">
+            <div style="text-align: center;margin-bottom: 50px;">
+                <h1>How It Work</h1>
+                <p style="margin-bottom: 10px;">By auto event push of webhook, we can show stars change of your repositories and who stared it for you.</p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+            <div class="col-xs-12 col-sm-4" style="text-align: center">
+                <i class="fa fa-sign-in" style="font-size: 130px;"></i>
+                <h2>1. Login With Github</h2>
+                <p>We need your authorization include repo's webhook reading and writing and user's following.</p>
+            </div>
+            <div class="col-xs-12 col-sm-4" style="text-align: center">
+                <i class="fa fa-book" style="font-size: 130px;"></i>
+                <h2>2. Add A Repository URL</h2>
+                <p>Once you add it, we set your repo's webhook payload url to ours and we initialize by recode history event.</p>
+            </div>
+            <div class="col-xs-12 col-sm-4" style="text-align: center">
+                <i class="fa fa-line-chart" style="font-size: 130px;"></i>
+                <h2>3. Star Recode</h2>
+                <p>Once someone star your repo, webhook post an event to our server and we insert it to database.</p>
+            </div>
+    </div>
+</div>
+<div class="container">
+    <div class="row" style="padding-left: 100px;padding-right: 100px;">
+        <h1 style="text-align: center">Q & A</h1>
+        <div style="padding-top: 15px;font-size: 22px;">
+            Why my repository's star recode is not as enough as it should be?
+        </div>
+        <div style="padding-top:7px;font-size:17px;">
+            Because when initialize the repository, we can only get small amount pages history of event records by <a
+                href="https://developer.github.com/v3/#pagination">github api</a>. As the github api said, in order to keep the API fast for everyone, pagination is limited for this resource.
+        </div>
+        <div style="padding-top: 35px;font-size: 22px;">
+            Why my repository's followers distribution is not equal to the stars amount?
+        </div>
+        <div style="padding-top:7px;font-size:17px;">
+             Some body do not set their location, besides we use <a href="geonames.org">geonames.org</a> api to judge accurate name of your city. If you name it by nickname, take for example, you named Beijing of China to DiDU(帝都), we can not recognize it. We set the location to none.
+            If you have better api than getnames.org, contact me(no13bus@gmail.com). Thanks.
+        </div>
+
+    </div>
+</div>
+{% end %}

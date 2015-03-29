@@ -2,55 +2,75 @@
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <title>{{ title }}</title>
-  <link rel="stylesheet" href="{{ static_url("css/bootstrap.min.css") }}" type="text/css" />
-  <link rel="stylesheet" href="{{ static_url("css/flat-ui.css") }}" type="text/css" />
-  <link rel="stylesheet" href="{{ static_url("css/app.css") }}" type="text/css" />
-   {% block styles %}{% endblock %} 
+  <title>ohmyrepo</title>
+  <link rel="stylesheet" href='http://7xi88w.com1.z0.glb.clouddn.com/bootstrap.min.css' type="text/css" />
+   <link rel="stylesheet" href="http://cdn.bootcss.com/font-awesome/4.2.0/css/font-awesome.css"/>
+
    <script type="text/javascript" src="http://cdn.bootcss.com/jquery/2.1.3/jquery.js"></script>
-   {% block scripts %}{% endblock %} 
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
 </head>
-<body>
-  <div class="navbar navbar-fixed-top">
-    <div class="navbar-inner">
-      <div class="container">
-        <a class="brand" href="/">{{ settings['app_name'] }}</a>
-        <ul class="nav">
-          <li><a href="/">首页</a></li>
-        </ul>
-        <ul class="nav pull-right">
-          {% if not current_user %}
-          <li><a href="{{ giturl }}">Github登陆</a></li>
-          <li><a href="/register">注册</a></li>
-          {% else %}
-          <li><a href="/settings">{{ current_user }}</a></li>
-          <li><a href="/logout">退出</a></li>
-          {% endif %}
-        </ul>
-      </div>
+<body style="padding: 70px 0px 50px;">
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a href="/" class="navbar-brand">OhMyRepo</a>
+        </div>
+        <div class="navbar-collapse collapse" id="navbar-main">
+            <ul class="nav navbar-nav">
+                <li>
+                  <a href="https://github.com/no13bus/ohmyrepo" target="_blank"><i class="fa fa-github"></i> Source code</a>
+                </li>
+                <li>
+                    <a href="/howitwork"><i class="fa fa-gears"></i> How it work</a>
+                </li>
+
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                {% if not current_user %}
+                  <li><a href="/login" title="Sign in"><i class="fa fa-sign-in fa-lg"></i> Sign in</a></li>
+                {% else %}
+                  <li><a href="/"><img src="{{ avatar_url }}" style="width: 20px; height:20px;" title="{{ current_user }}"/></a></li>
+                  <li><a href="/add" title="Add a repo"><i class="fa fa-plus fa-lg"></i> Add repo</a></li>
+                  <li>
+                      <a href="/logout" title="Sign out"><i class="fa fa-sign-out fa-lg"></i> Sign out</a>
+                  </li>
+                {% end %}
+            </ul>
+        </div>
     </div>
-  </div>
+</div>
 
-
-  <div id="main" class="container">
+  <div class="container">
+      {% block body %}
     <div class="row">
-      <div class="span9">
-        {% block body %}{% endblock %}  
-      </div>
-      <div class="span3">
-        {% block sidebar %}{% endblock %}
+      <div class="span4">
+
       </div>
     </div>
+      {% end %}
   </div>
 
+{% block scripts %}{% end %}
 
-  <footer>
-    <center>
-      <p class="copyright">
-        &copy; {{ settings['app_name'] }}
-      </p>
-    </center>
-  </footer>
-  {% block bottom %}{% endblock %}
+{% block bottom %}
+    <div class="navbar-fixed-bottom" style="background: #2C3E50;font-size: 14px;text-align: center;color: #B4AFB4;padding-top: 22px;padding-bottom: 22px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <span>@<a href="https://github.com/no13bus" target="_blank">no13bus</a></span>
+                    <span>Powered by <a href="https://github.com/tornadoweb/tornado" target="_blank">Tornado</a></span> |
+                    <span><a href="https://bootswatch.com/flatly/" target="_blank">Bootswatch</a></span> |
+                    <span><a href="http://www.linode.com/" target="_blank">Linode</a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+{% end %}
 </body>
 </html>
+
+
+
+
