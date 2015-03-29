@@ -30,11 +30,14 @@ http://ohmyrepo.ml
 
 
 ## Project Screen
-![1](https://raw.githubusercontent.com/no13bus/redispapa/master/screen/1.png)
-![2](https://raw.githubusercontent.com/no13bus/redispapa/master/screen/2.png)
-![3](https://raw.githubusercontent.com/no13bus/redispapa/master/screen/3.png)
-![version 0.2](https://raw.githubusercontent.com/no13bus/redispapa/master/screen/4.png)
-![version 0.2](https://raw.githubusercontent.com/no13bus/redispapa/master/screen/5.png)
+![2](https://raw.githubusercontent.com/no13bus/ohmyrepo/master/screen/2.png)
+![3](https://raw.githubusercontent.com/no13bus/ohmyrepo/master/screen/3.png)
+![4](https://raw.githubusercontent.com/no13bus/ohmyrepo/master/screen/4.png)
+![5](https://raw.githubusercontent.com/no13bus/ohmyrepo/master/screen/5.png)
+![6](https://raw.githubusercontent.com/no13bus/ohmyrepo/master/screen/6.png)
+![7](https://raw.githubusercontent.com/no13bus/ohmyrepo/master/screen/7.png)
+![8](https://raw.githubusercontent.com/no13bus/ohmyrepo/master/screen/8.png)
+
 
 ## Version 0.0.1
 show users' repo star, follower infomations in the human style.
