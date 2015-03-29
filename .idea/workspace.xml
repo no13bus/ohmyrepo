@@ -76,11 +76,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-29.433332" vertical-offset="217" max-vertical-offset="1232">
-              <caret line="50" column="0" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.31694695" vertical-offset="349" max-vertical-offset="1254">
+              <caret line="27" column="161" selection-start-line="27" selection-start-column="161" selection-end-line="27" selection-end-column="161" />
               <folding />
             </state>
           </provider>
@@ -89,11 +89,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="README_CN.md" pinned="false" current-in-tab="true">
+      <file leaf-file-name="README_CN.md" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/README_CN.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.28848642" vertical-offset="371" max-vertical-offset="1232">
-              <caret line="27" column="243" selection-start-line="27" selection-start-column="243" selection-end-line="27" selection-end-column="243" />
+            <state vertical-scroll-proportion="-15.5" vertical-offset="107" max-vertical-offset="1166">
+              <caret line="26" column="19" selection-start-line="26" selection-start-column="19" selection-end-line="26" selection-end-column="19" />
               <folding />
             </state>
           </provider>
@@ -155,8 +155,8 @@
         <option value="$PROJECT_DIR$/tasks.py" />
         <option value="$PROJECT_DIR$/handlers.py" />
         <option value="$PROJECT_DIR$/app.py" />
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/README_CN.md" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -667,10 +667,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
+    <entry file="file://$PROJECT_DIR$/README_CN.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-29.433332" vertical-offset="217" max-vertical-offset="1232">
-          <caret line="50" column="0" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
+        <state vertical-scroll-proportion="-15.5" vertical-offset="107" max-vertical-offset="1166">
+          <caret line="26" column="19" selection-start-line="26" selection-start-column="19" selection-end-line="26" selection-end-column="19" />
           <folding />
         </state>
       </provider>
@@ -678,10 +678,10 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README_CN.md">
+    <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.28848642" vertical-offset="371" max-vertical-offset="1232">
-          <caret line="27" column="243" selection-start-line="27" selection-start-column="243" selection-end-line="27" selection-end-column="243" />
+        <state vertical-scroll-proportion="0.31694695" vertical-offset="349" max-vertical-offset="1254">
+          <caret line="27" column="161" selection-start-line="27" selection-start-column="161" selection-end-line="27" selection-end-column="161" />
           <folding />
         </state>
       </provider>

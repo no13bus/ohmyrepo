@@ -25,6 +25,7 @@ http://ohmyrepo.ml
 - If you want to record your repository, you should login with github firstly. We need your authorization include repo's webhook reading and writing and user's following.
 - Secondly, you add your repository in the [ohmyrepo.ml](http://ohmyrepo.ml), we set your repo's webhook payload url to ours and we initialize by recode history event.
 - Thirdly, once someone star your repo, github webhook immediately post an event to our server and we insert it to database.
+- You can add this string `[![repo](http://ohmyrepo.ml/static/ohmyrepo.png)](http://ohmyrepo.ml/show?u=no13bus&r=redispapa)` into your README.md file。For example: [![repo](http://ohmyrepo.ml/static/ohmyrepo.png)](http://ohmyrepo.ml/show?u=no13bus&r=redispapa)
 - We use mongodb to store user and repo information. The mongodb is awesome, especially its query statement. And we use [motor](https://github.com/mongodb/motor) as tornado's mongo asynchronous client.
 - We use redis as tornado cache. Thanks for [cloverstd's](https://github.com/cloverstd) good cache [library](https://gist.github.com/cloverstd/10712505).
 
