@@ -18,7 +18,10 @@
 - [mongo]()
 - [redis]()
 
-## Demo
+## Demo website
+http://ohmyrepo.ml/show?u=no13bus&r=ohmyrepo
+
+## 主页(github登录)
 http://ohmyrepo.ml
 
 ## 项目细节
