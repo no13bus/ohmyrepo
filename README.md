@@ -19,6 +19,9 @@ use webhook to analysis automaticly that who stared your repository, where are t
 - [Highchart](http://www.highcharts.com/)
 
 ## Demo website
+http://ohmyrepo.ml/show?u=no13bus&r=ohmyrepo
+
+## Index
 http://ohmyrepo.ml
 
 ## Project Details
