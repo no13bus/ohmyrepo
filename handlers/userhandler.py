@@ -53,4 +53,4 @@ class HowHandler(BaseHandler):
     @gen.coroutine
     def get(self):
         avatar_url = self.get_secure_cookie('avatar_url', None)
-        self.render('howitwork.html', avatar_url=avatar_url)
+        self.render('howitworks.html', avatar_url=avatar_url)

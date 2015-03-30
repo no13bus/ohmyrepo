@@ -33,7 +33,7 @@ class Application(tornado.web.Application):
             (r"/add", AddWebhookHandler),
             (r"/show", ShowHandler),
             (r"/login", LoginHandler),
-            (r"/howitwork", HowHandler)
+            (r"/howitworks", HowHandler)
         ]
         self.session_manager = session.TornadoSessionManager(settings["session_secret"], settings["session_dir"])
         self.redis = redis.Redis()
