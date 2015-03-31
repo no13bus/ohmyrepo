@@ -78,10 +78,13 @@ def add_webhook(username, reponame, client, token, webhook):
     all_hooks_resp = yield client.fetch(req_url, raise_error=False)
     print all_hooks_resp.code
     if all_hooks_resp.code != 200:
-        print '11111111'
+        print 'all_hooks_resp.code is %s' % all_hooks_resp.code
         raise gen.Return(False)
     all_hooks_json = json.loads(all_hooks_resp.body)
-    hook_res = [i['id'] for i in all_hooks_json if i['config']['url']==webhook]
+    if not all_hooks_json:
+        hook_res = []
+    else:
+        hook_res = [i['id'] for i in all_hooks_json if 'url' in i['config'] and i['config']['url']==webhook]
     if not hook_res:
         data = {
             "name": "web",
@@ -98,8 +101,8 @@ def add_webhook(username, reponame, client, token, webhook):
         req = HTTPRequest(url=req_url, method="POST", body=json.dumps(data))
         res = yield client.fetch(req, raise_error=False)
         print res.code
-        if res.code != 200:
-            print 'errrrrrr'
+        if res.code != 200 and res.code != 201:
+            print 'res.code is %s. error.' % res.code
             raise gen.Return(False)
     raise gen.Return(True)
 
