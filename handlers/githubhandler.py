@@ -83,6 +83,7 @@ class AddWebhookHandler(BaseHandler):
     @gen.coroutine
     def post(self):
         repo_url = self.get_argument('webhook_url', '')
+        print 'repo_url=%s' % repo_url
         reponame = repo_url.split('/')[-1]
         username = repo_url.split('/')[-2]
         print username
@@ -98,7 +99,7 @@ class AddWebhookHandler(BaseHandler):
                 # database init
                 if set_hook_res:
                     tornado.ioloop.IOLoop.current().spawn_callback(webhook_init, username, reponame, client, token, self.db)
-                    self.set_flash('This repo is initializing. You can refresh after a while.')
+                    self.set_flash("This repo is initializing. You can refresh after a while. You can see <a href='/repos'>others\'s repos</a>.")
                     self.redirect('/show?u=%s&r=%s' % (username, reponame))
                 else:
                     self.error_msg = 'There is some error when it is added. Please add it again.'

@@ -1,0 +1,33 @@
+{% extends "base.html" %} {% block body %}
+
+<div class="row">
+    <div class="col-md-6" style="text-align: center;margin-top: 80px;">
+            <h2>Users Amount</h2>
+            <span style="margin-top: 20px;font-weight: 700;font-size: 8em;color: #18BC9C;width: 240px;line-height: 240px;background: #2C3E50;border-radius: 50%;display: inline-block;"><a
+                    href="/users">{{ users }}</a></span>
+
+    </div>
+
+    <div class="col-md-6" style="text-align: center;margin-top: 80px;">
+            <h2>Repositories Amount</h2>
+            <span style="margin-top: 20px;font-weight: 700;font-size: 8em;color: #18BC9C;width: 240px;line-height: 240px;background: #2C3E50;border-radius: 50%;display: inline-block;"><a
+                    href="/repos">{{ repos }}</a></span>
+    </div>
+
+    {% if error_msg %}
+        <div style="margin: 50px 100px 30px;text-align:center;" class="alert alert-dismissible alert-warning">
+              <button type="button" class="close" data-dismiss="alert">×</button>
+              <h1>{{ error_msg }}</h1>
+        </div>
+        <div style="margin: 200px 300px 30px;text-align:center;">
+           <a href="/add" class='btn btn-info btn-lg' role='button'>
+                <i class='fa fa-github-alt'></i> Add Now
+           </a>
+        </div>
+
+    {% end %}
+
+
+</div>
+
+{% end %}

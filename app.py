@@ -15,8 +15,6 @@ import redis
 define("port", default=8888, help="run on the given port", type=int)
 define("debug", default=True, help="debug mode", type=bool)
 define("mongo_host", default="127.0.0.1:27017", help="database host")
-define("mongo_database", default="quora", help="database name")
-
 
 class Application(tornado.web.Application):
     def __init__(self):
@@ -33,7 +31,11 @@ class Application(tornado.web.Application):
             (r"/add", AddWebhookHandler),
             (r"/show", ShowHandler),
             (r"/login", LoginHandler),
-            (r"/howitworks", HowHandler)
+            (r"/howitworks", HowHandler),
+            (r"/stat", StatHandler),
+            (r"/users", StatUserHandler),
+            (r"/repos", StatRepoHandler)
+
         ]
         self.session_manager = session.TornadoSessionManager(settings["session_secret"], settings["session_dir"])
         self.redis = redis.Redis()

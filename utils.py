@@ -20,8 +20,10 @@ def webhook_init(username, reponame, client, token, db):
     event_user_url = 'https://api.github.com/repos/%s/%s/events?page=%s&per_page=100&access_token=%s'
     i = 1
     while True:
+        print event_user_url % (username, reponame, i, token)
         event_info = yield client.fetch(event_user_url % (username, reponame, i, token), raise_error=False)
         if event_info.code != 200:
+            print event_info.code
             print 'it is done!'
             break
         print 'ooop'
@@ -75,16 +77,21 @@ def webhook_init(username, reponame, client, token, db):
 @gen.coroutine
 def add_webhook(username, reponame, client, token, webhook):
     req_url = "https://api.github.com/repos/%s/%s/hooks?access_token=%s" % (username, reponame, token)
+    print 'req_url=%s' % req_url
     all_hooks_resp = yield client.fetch(req_url, raise_error=False)
     print all_hooks_resp.code
     if all_hooks_resp.code != 200:
-        print 'all_hooks_resp.code is %s' % all_hooks_resp.code
+        print 'all_hooks_resp.code is not 200'
         raise gen.Return(False)
     all_hooks_json = json.loads(all_hooks_resp.body)
+    print '******all_hooks_json******'
+    print all_hooks_json
+    print '******all_hooks_json******'
     if not all_hooks_json:
         hook_res = []
     else:
         hook_res = [i['id'] for i in all_hooks_json if 'url' in i['config'] and i['config']['url']==webhook]
+
     if not hook_res:
         data = {
             "name": "web",
@@ -101,8 +108,8 @@ def add_webhook(username, reponame, client, token, webhook):
         req = HTTPRequest(url=req_url, method="POST", body=json.dumps(data))
         res = yield client.fetch(req, raise_error=False)
         print res.code
-        if res.code != 200 and res.code != 201:
-            print 'res.code is %s. error.' % res.code
+        if res.code != 201 and res.code != 200:
+            print "res.code is %s. it's wrong" % res.code
             raise gen.Return(False)
     raise gen.Return(True)
 

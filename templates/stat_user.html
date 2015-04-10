@@ -1,0 +1,35 @@
+{% extends "base.html" %} {% block body %}
+
+<div class="row">
+    <div>
+        {% if users %}
+        <h1 style="text-align:center;margin:60px 50px 30px;">Users List</h1>
+        <ul style="list-style: none;">
+                {% for user in users %}
+                <li style="float: left;width: 110px;height: 68px;padding: 10px;text-align: center;margin-bottom: 20px;">
+                    <a style="display: block;" target="_blank" href="https://github.com/{{ user['username'] }}"><img style="width: 50px; height:50px; border-radius: 10px;" src="{{ user['avatar_url'] }}" alt="{{ user['username'] }}"/></a>
+                    <a target="_blank" href="https://github.com/{{ user['username'] }}">{{ user['username'] }}</a>
+                </li>
+                {% end %}
+        </ul>
+        {% end %}
+    </div>
+
+
+    {% if error_msg %}
+        <div style="margin: 50px 100px 30px;text-align:center;" class="alert alert-dismissible alert-warning">
+              <button type="button" class="close" data-dismiss="alert">×</button>
+              <h1>{{ error_msg }}</h1>
+        </div>
+        <div style="margin: 200px 300px 30px;text-align:center;">
+           <a href="/add" class='btn btn-info btn-lg' role='button'>
+                <i class='fa fa-github-alt'></i> Add Now
+           </a>
+        </div>
+
+    {% end %}
+
+
+</div>
+
+{% end %}

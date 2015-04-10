@@ -1,0 +1,70 @@
+{% extends "base.html" %} {% block body %}
+<style>
+    .repo_li
+    {
+        display: list-item;
+        float: left;
+    }
+    .repo_li:hover
+    {
+        background: #FBF4E3;
+        display: list-item;
+    }
+    .repo_url
+    {
+        text-decoration: none;
+        color: #534540;
+        font-size: 20px;
+        font-weight: 600;
+        margin: 6px 2px 0 0px;
+    }
+    .repo_url:hover
+    {
+        text-decoration: underline;
+        color: #534540;
+    }
+</style>
+<div class="row">
+    <div>
+        {% if repos %}
+            <h1 style="text-align:center;margin:60px 50px 30px;">Repos List</h1>
+            <ul style="list-style: none;">
+                {% for repo in repos %}
+                <li class="col-md-6 repo_li">
+                      <div>
+                          <div style="font-size: 18px;min-height: 62px;line-height: 17px;padding-top: 15px;padding-bottom: 15px;clear: both;box-sizing: border-box;padding: 10px;margin: 0 -10px;cursor: pointer;border-radius: 3px;position: relative;transition: background, 0.1s;">
+                              <a style="background: #edeceb;float: left;height: 40px;margin: 0 11px 0 0;position: relative;text-align: center;width: 40px;" target="_blank" href="https://github.com/{{ repo['username'] }}">
+                              <img style="width: 40px; height:40px; border-radius: 1px;" src="{{ repo['avatar_url'] }}" alt="{{ repo['username'] }}">
+                              </a>
+                              <div>
+                                <div style="box-sizing: border-box;float: left;">
+                                  <a href="/show?u={{ repo['username'] }}&r={{ repo['reponame'] }}" target="_blank" class="repo_url">{{ repo['reponame'] }}</a>
+                                  <span style="color: #999999;font-size: 17px;margin: 5px 0 0 0px;display: block;line-height: 20px;"> click me</span>
+                                </div>
+                              </div>
+                          </div>
+                      </div>
+                </li>
+                {% end %}
+            </ul>
+        {% end %}
+    </div>
+
+
+    {% if error_msg %}
+        <div style="margin: 50px 100px 30px;text-align:center;" class="alert alert-dismissible alert-warning">
+              <button type="button" class="close" data-dismiss="alert">×</button>
+              <h1>{{ error_msg }}</h1>
+        </div>
+        <div style="margin: 200px 300px 30px;text-align:center;">
+           <a href="/add" class='btn btn-info btn-lg' role='button'>
+                <i class='fa fa-github-alt'></i> Add Now
+           </a>
+        </div>
+
+    {% end %}
+
+
+</div>
+
+{% end %}
