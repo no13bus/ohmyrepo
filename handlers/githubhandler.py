@@ -66,6 +66,9 @@ class CallbackHandler(BaseHandler):
         if not user:
             user_id = yield self.db.user.insert({'username': username, 'token': token, 'avatar_url': avatar_url})
             print user_id
+        else:
+            res_update = yield self.db.user.update({'username': username}, {'$set': {'token': token}})
+            print res_update
         self.set_secure_cookie('token', token)
         self.set_secure_cookie('username', username)
         self.set_secure_cookie('avatar_url', avatar_url)
@@ -86,24 +89,24 @@ class AddWebhookHandler(BaseHandler):
         print 'repo_url=%s' % repo_url
         reponame = repo_url.split('/')[-1]
         username = repo_url.split('/')[-2]
-        print username
-        if username == self.get_secure_cookie('username'):
-            res = yield self.db.event.find_one({'username': username, 'reponame': reponame})
-            if res:
-                self.error_msg = 'You already add this repo!'
-                self.render('add.html', avatar_url=self.get_secure_cookie('avatar_url'))
-            else:
-                client = AsyncHTTPClient()
-                token = self.get_secure_cookie('token')
-                set_hook_res = yield add_webhook(username, reponame, client, token, githubapi['WEBHOOK_URL'])
-                # database init
-                if set_hook_res:
-                    tornado.ioloop.IOLoop.current().spawn_callback(webhook_init, username, reponame, client, token, self.db)
-                    self.set_flash("This repo is initializing. You can refresh after a while. You can see <a href='/repos'>others\'s repos</a>.")
-                    self.redirect('/show?u=%s&r=%s' % (username, reponame))
-                else:
-                    self.error_msg = 'There is some error when it is added. Please add it again.'
-                    self.render('add.html', avatar_url=self.get_secure_cookie('avatar_url'))
-        else:
-            self.error_msg = 'This repo is not yours!'
+        add_username = self.get_secure_cookie('username')
+        # if username == self.get_secure_cookie('username'):
+        res = yield self.db.event.find_one({'username': username, 'reponame': reponame})
+        if res:
+            self.error_msg = 'You already add this repo!'
             self.render('add.html', avatar_url=self.get_secure_cookie('avatar_url'))
+        else:
+            client = AsyncHTTPClient()
+            token = self.get_secure_cookie('token')
+            set_hook_res = yield add_webhook(username, reponame, client, token, githubapi['WEBHOOK_URL'])
+            # database init
+            if set_hook_res:
+                tornado.ioloop.IOLoop.current().spawn_callback(webhook_init, username, reponame, client, token, self.db, add_username)
+                self.set_flash("This repo is initializing. You can refresh after a while. You can see <a href='/repos'>others\'s repos</a>.")
+                self.redirect('/show?u=%s&r=%s' % (username, reponame))
+            else:
+                self.error_msg = 'This repo is not yours or there is some error when it is added. Please add it again.'
+                self.render('add.html', avatar_url=self.get_secure_cookie('avatar_url'))
+        # else:
+        #     self.error_msg = 'This repo is not yours!'
+        #     self.render('add.html', avatar_url=self.get_secure_cookie('avatar_url'))

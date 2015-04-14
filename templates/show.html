@@ -132,7 +132,12 @@
                               var $td = $("<td>" + (i+1) + "</td>")
                               var $td1 = $("<td><a target='_blank' href='https://github.com/" + obj['result'][i]['sender_name'] + "'>" +"<img src='" + obj['result'][i]['avatar_url'] + "' style='width: 50px; height:50px; border-radius: 10px;' title='" + obj['result'][i]['sender_name'] + "'/></a></td>");
                               var $td2 = $("<td>" + obj['result'][i]['followers'] + "</td>");
-                              var $td3 = $("<td><a name=" + obj['result'][i]['sender_name'] +" id='follow' href='/f?u=" + obj['result'][i]['sender_name'] + "' class='btn btn-info btn-md' role='button'><i class='fa fa-github-alt'></i>Follow</a></td>");
+                              if (obj['result'][i]['followed'] == true){
+                                    var $td3 = $("<td><a name=" + obj['result'][i]['sender_name'] +" id='follow' href='/uf?u=" + obj['result'][i]['sender_name'] + "' class='btn btn-default btn-md' role='button'><i class='fa fa-github-alt'></i>Unfollow</a></td>");
+                              }else{
+                                  var $td3 = $("<td><a name=" + obj['result'][i]['sender_name'] +" id='follow' href='/f?u=" + obj['result'][i]['sender_name'] + "' class='btn btn-info btn-md' role='button'><i class='fa fa-github-alt'></i>Follow</a></td>");
+                              }
+
                               $tr.append($td);
                               $tr.append($td1);
                               $tr.append($td2);

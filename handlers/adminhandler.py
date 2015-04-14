@@ -42,7 +42,7 @@ class StatRepoHandler(BaseHandler):
         repos = []
         star_pipe = [
                     {'$group': {
-                        '_id': {'username': '$username', 'reponame': '$reponame'}
+                        '_id': {'username': '$username', 'reponame': '$reponame', 'add_username':'$add_username'}
                     }}
                 ]
         cursor = yield self.db.event.aggregate(star_pipe, cursor={})
@@ -50,6 +50,8 @@ class StatRepoHandler(BaseHandler):
             while (yield cursor.fetch_next):
                 doc = cursor.next_object()
                 one_user = yield self.db.user.find_one({'username':doc['_id']['username']})
+                if not one_user:
+                    one_user = yield self.db.user.find_one({'username':doc['_id']['add_username']})
                 doc['_id']['avatar_url'] = one_user['avatar_url']
                 repos.append(doc['_id'])
             if not repos:

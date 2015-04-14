@@ -16,7 +16,7 @@ from libs.geoname import get_geo_name
 AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
 
 @gen.coroutine
-def webhook_init(username, reponame, client, token, db):
+def webhook_init(username, reponame, client, token, db, add_username):
     event_user_url = 'https://api.github.com/repos/%s/%s/events?page=%s&per_page=100&access_token=%s'
     i = 1
     while True:
@@ -68,6 +68,7 @@ def webhook_init(username, reponame, client, token, db):
                 yield db.event.insert({
                     'username': username,
                     'reponame':reponame,
+                    'add_username':add_username,
                     'sender': sender,
                     'time': parser.parse(one['created_at'])
                 })

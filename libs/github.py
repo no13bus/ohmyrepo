@@ -33,3 +33,17 @@ def unfollow(username, token):
         print "code:%d, message:%s" % (e.code, e.message)
     raise gen.Return(False)
 
+
+@gen.coroutine
+def followed_bool(u1, u2):
+    client = AsyncHTTPClient()
+    f_url = 'https://api.github.com/users/%s/following/%s' % (u1, u2)
+    try:
+        f_res = yield client.fetch(f_url, raise_error=False)
+        if f_res.code == 204:
+            raise gen.Return(True)
+        else:
+            raise gen.Return(False)
+    except HTTPError, e:
+        print "code:%d, message:%s" % (e.code, e.message)
+    raise gen.Return(False)
