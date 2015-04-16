@@ -101,13 +101,14 @@ class ShowHandler(BaseHandler):
         avatar_url = self.get_secure_cookie('avatar_url', None)
         username = self.get_argument('u', '')
         reponame = self.get_argument('r', '')
+        chart_filename = '%s_%s' % (username, reponame)
         if username and reponame:
             event = yield self.db.event.find_one({'username': username, 'reponame': reponame})
             if event:
                 stars_url = '/stars?u=%s&r=%s' % (username, reponame)
                 cities_url = '/cities?u=%s&r=%s' % (username, reponame)
                 follows_url = '/follows?u=%s&r=%s' % (username, reponame)
-                self.render('show.html', stars_url=stars_url, cities_url=cities_url, follows_url=follows_url, avatar_url=avatar_url)
+                self.render('show.html', chart_filename=chart_filename, stars_url=stars_url, cities_url=cities_url, follows_url=follows_url, avatar_url=avatar_url)
                 return
             else:
                 self.error_msg = "<p>We do not have this repo\'s star recodes!</p><p>Please check whether it have any stars,</p><p>or <a href='/add' style='color: #2C3E50'>add it now?</a></p>"

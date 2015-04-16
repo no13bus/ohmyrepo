@@ -34,7 +34,8 @@ class Application(tornado.web.Application):
             (r"/howitworks", HowHandler),
             (r"/stat", StatHandler),
             (r"/users", StatUserHandler),
-            (r"/repos", StatRepoHandler)
+            (r"/repos", StatRepoHandler),
+            (r"/export", ExportHandler),
 
         ]
         self.session_manager = session.TornadoSessionManager(settings["session_secret"], settings["session_dir"])

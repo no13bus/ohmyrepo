@@ -38,7 +38,8 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def check_xsrf_cookie(self):
         header = self.request.headers
-        if not ('GitHub-Hookshot' in header['User-Agent']):
+        url = self.request.uri
+        if (not ('GitHub-Hookshot' in header['User-Agent'])) and url != '/export':
             super(BaseHandler, self).check_xsrf_cookie()
 
     # def write(self, chunk):

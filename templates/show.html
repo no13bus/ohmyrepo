@@ -26,12 +26,18 @@
             </div>
         {% end %}
 
+
+
  </div>
 {% end %}
 
 
 {% block scripts %}
     <script type="application/javascript" src="http://code.highcharts.com/highcharts.js"></script>
+    <script type="application/javascript">
+        var chart_filename = "{{ chart_filename }}";
+    </script>
+    <script type="application/javascript" src="{{ static_url('js/export.js') }}"></script>
     <script type="application/javascript" src="http://code.highcharts.com/maps/modules/map.js"></script>
     <script src="http://code.highcharts.com/mapdata/custom/world.js"></script>
     {% if not error_msg and not flash %}
