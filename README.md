@@ -48,6 +48,10 @@ add origanzation support and fix user's following list bug.
 ## Version 0.0.1
 show users' repo star, follower infomations in the human style.
 
+## TODO
+- [ ] weibo share
+
+
 ## Q & A
 - Why my repository's star recode is not as enough as it should be?
 > Because when initialize the repository, we can only get small amount pages history of event records by github api. As the github api said, in order to keep the API fast for everyone, pagination is limited for this resource.
