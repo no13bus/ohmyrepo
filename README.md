@@ -2,7 +2,7 @@
 use webhook to analysis automaticly that who stared your repository, where are they. Besides you can fellow some users. 
 
 ================
-
+[![repo](http://ohmyrepo.ml/static/ohmyrepo.png)](http://ohmyrepo.ml/show?u=no13bus&r=ohmyrepo)
 [中文文档](https://github.com/no13bus/ohmyrepo/blob/master/README_CN.md)
 
 ## Let's start
