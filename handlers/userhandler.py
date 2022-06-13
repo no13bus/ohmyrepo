@@ -72,13 +72,13 @@ class ExportHandler(BaseHandler):
         if filename and svg:
             img_path = '%s/chart/%s.png' % (parent_path, filename)
             url_path = '/static/chart/%s.png' % filename
-            print 'img_path=%s' % img_path
+            print('img_path=%s' % img_path)
             try:
                 cairosvg.svg2png(svg, write_to=img_path)
                 self.write({'status': 1, 'url': url_path})
                 return
             except Exception as ex:
-                print 'error of svg2png is %s' % ex.message
+                print('error of svg2png is %s' % ex.message)
         self.write({'status': 0})
 
 

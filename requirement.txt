@@ -1,3 +1,6 @@
 tornado
 redis
+python-dateutil
 motor
+pycurl
+cairosvg

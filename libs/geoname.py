@@ -14,15 +14,15 @@ AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
 def get_geo_name(location):
     client = AsyncHTTPClient()
     url = GEO_URL % (location, random.choice(GEO_NAME))
-    print url
+    print(url)
     resp = {}
     res = None
     try:
         res = yield client.fetch(url)
     except Exception as ex:
-        print "error message:%s" % ex.message
+        print("error message:%s" % ex.message)
         raise gen.Return(resp)
-    print location
+    print(location)
     res_json = json.loads(res.body)
     if res_json and 'geonames' in res_json and res_json['geonames']:
         res_one = res_json['geonames'][0]
@@ -30,7 +30,7 @@ def get_geo_name(location):
         resp['country'] = res_one['countryName']
         resp['countrycode'] = res_one['countryCode']
     else:
-        print res_json
+        print(res_json)
         resp['city'] = ''
         resp['country'] = ''
         resp['countrycode'] = ''

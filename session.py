@@ -100,10 +100,11 @@ class SessionManager(object):
         session_file.close() 
         
     def _get_hmac_digest(self, session_id):
-        return hmac.new(session_id, self.secret, hashlib.sha1).hexdigest()
+        key = bytes(session_id, encoding='utf-8')
+        return hmac.new(key, self.secret.encode("utf-8"), hashlib.sha1).hexdigest()
                
     def _generate_uid(self):
-        base = hashlib.md5( self.secret + str(uuid.uuid4()) )
+        base = hashlib.md5((self.secret + str(uuid.uuid4())).encode("utf-8"))
         return base.hexdigest()       
      
 class TornadoSessionManager(SessionManager):
@@ -134,8 +135,12 @@ class TornadoSession(Session):
         except InvalidSessionException:
             plain_session = tornado_session_manager.get()
 
-        for i, j in plain_session.iteritems():
-            self[i] = j
+        print("plain_session")
+        print(plain_session)
+
+
+        # for i, j in plain_session.iteritems():
+        #     self[i] = j
         self.session_id = plain_session.session_id
         self.hmac_digest = plain_session.hmac_digest
             

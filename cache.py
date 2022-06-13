@@ -33,7 +33,7 @@ class CacheMixin(object):
     def prepare(self):
         super(CacheMixin, self).prepare()
         key = self._generate_key(self.request)
-        print key
+        print(key)
         if self.cache.exists(self._prefix(key)):
             rv = pickle.loads(self.cache.get(self._prefix(key)))
             self.write_cache(rv)
@@ -103,6 +103,6 @@ class RedisCacheBackend(CacheBackend):
         self.redis.delete(key)
  
     def exists(self, key):
-        print key
+        print(key)
  
         return bool(self.redis.exists(key))

@@ -1,4 +1,5 @@
 # coding: UTF-8
+import asyncio
 import tornado.auth
 import tornado.httpserver
 import tornado.ioloop
@@ -45,13 +46,19 @@ class Application(tornado.web.Application):
         tornado.web.Application.__init__(self, handlers, **settings)
 
 
-def main():
+# async def main():
+#     tornado.options.parse_command_line()
+#     application = tornado.web.Application([(r"/", MainHandler)])
+#     http_server = tornado.httpserver.HTTPServer(application)
+#     http_server.listen(options.port)
+#     await asyncio.Event().wait()
+
+
+async def main():
     tornado.options.parse_command_line()
     http_server = tornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
-    instance = tornado.ioloop.IOLoop.instance()
-    tornado.autoreload.start(instance)
-    instance.start()
+    await asyncio.Event().wait()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

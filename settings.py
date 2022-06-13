@@ -11,15 +11,15 @@ settings['xsrf_cookies'] = True
 settings['cookie_secret'] = "81o0T=="
 settings['login_url'] = '/login'
 settings['session_secret'] = '08091287&^(01'
-settings['session_dir'] = '/home/ohmyrepo/tmp/session'
+settings['session_dir'] = '/tmp/session'
 settings['db'] = motor.MotorClient('localhost', 27017).ohmyrepo
 
 # github application settings
 githubapi = {}
 githubapi['CLIENT_ID'] =''
 githubapi['CLIENT_SECRET'] = ''
-githubapi['REDIRECT_URL'] = ''
+githubapi['REDIRECT_URL'] = 'https://ohmyrepo.v2j.tech/callback'
 githubapi['ACCESS_TOKEN_URL'] = ''
 githubapi['STATE'] = ''
-githubapi['WEBHOOK_URL'] = ''
-githubapi['OAUTH_URL'] = ''
+githubapi['WEBHOOK_URL'] = 'https://ohmyrepo.v2j.tech/webhook'
+githubapi['OAUTH_URL'] = 'https://github.com/login/oauth/authorize'

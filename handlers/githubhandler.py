@@ -65,10 +65,10 @@ class CallbackHandler(BaseHandler):
         # insert user info
         if not user:
             user_id = yield self.db.user.insert({'username': username, 'token': token, 'avatar_url': avatar_url})
-            print user_id
+            print(user_id)
         else:
             res_update = yield self.db.user.update({'username': username}, {'$set': {'token': token}})
-            print res_update
+            print(res_update)
         self.set_secure_cookie('token', token)
         self.set_secure_cookie('username', username)
         self.set_secure_cookie('avatar_url', avatar_url)
@@ -86,7 +86,7 @@ class AddWebhookHandler(BaseHandler):
     @gen.coroutine
     def post(self):
         repo_url = self.get_argument('webhook_url', '')
-        print 'repo_url=%s' % repo_url
+        print('repo_url=%s' % repo_url)
         reponame = repo_url.split('/')[-1]
         username = repo_url.split('/')[-2]
         add_username = self.get_secure_cookie('username')

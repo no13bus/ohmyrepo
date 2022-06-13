@@ -20,27 +20,27 @@ def webhook_init(username, reponame, client, token, db, add_username):
     event_user_url = 'https://api.github.com/repos/%s/%s/events?page=%s&per_page=100&access_token=%s'
     i = 1
     while True:
-        print event_user_url % (username, reponame, i, token)
+        print(event_user_url % (username, reponame, i, token))
         event_info = yield client.fetch(event_user_url % (username, reponame, i, token), raise_error=False)
         if event_info.code != 200:
-            print event_info.code
-            print 'it is done!'
+            print(event_info.code)
+            print('it is done!')
             break
-        print 'ooop'
+        print('ooop')
         event_info_json = json.loads(event_info.body)
         for one in event_info_json:
             if one['type'] == 'WatchEvent':
                 one_user_url = 'https://api.github.com/users/%s?access_token=%s' % (one['actor']['login'] ,token)
-                print one_user_url
+                print(one_user_url)
                 sender_info = yield client.fetch(one_user_url, raise_error=False)
                 if sender_info.code != 200:
-                    print 'it can not get this user infomation: %s!' % one['actor']['login']
+                    print('it can not get this user infomation: %s!' % one['actor']['login'])
                     continue
                 sender_info_json = json.loads(sender_info.body)
                 if 'location' in sender_info_json and sender_info_json['location']:
                     location = yield get_geo_name(sender_info_json['location'])
                     if not location:
-                        print 'it can not get location by geonames.org!'
+                        print('it can not get location by geonames.org!')
                         continue
                     city = location['city']
                     country = location['country']
@@ -53,7 +53,7 @@ def webhook_init(username, reponame, client, token, db, add_username):
                     location_str = ''
                     countrycode = ''
                     company = ''
-                print 'location: %s' % city
+                print('location: %s' % city)
                 sender = {
                     'followers': sender_info_json['followers'],
                     'sender_name': one['actor']['login'],
@@ -78,16 +78,16 @@ def webhook_init(username, reponame, client, token, db, add_username):
 @gen.coroutine
 def add_webhook(username, reponame, client, token, webhook):
     req_url = "https://api.github.com/repos/%s/%s/hooks?access_token=%s" % (username, reponame, token)
-    print 'req_url=%s' % req_url
+    print('req_url=%s' % req_url)
     all_hooks_resp = yield client.fetch(req_url, raise_error=False)
-    print all_hooks_resp.code
+    print(all_hooks_resp.code)
     if all_hooks_resp.code != 200:
-        print 'all_hooks_resp.code is not 200'
+        print('all_hooks_resp.code is not 200')
         raise gen.Return(False)
     all_hooks_json = json.loads(all_hooks_resp.body)
-    print '******all_hooks_json******'
-    print all_hooks_json
-    print '******all_hooks_json******'
+    print('******all_hooks_json******')
+    print(all_hooks_json)
+    print('******all_hooks_json******')
     if not all_hooks_json:
         hook_res = []
     else:
@@ -108,9 +108,9 @@ def add_webhook(username, reponame, client, token, webhook):
         }
         req = HTTPRequest(url=req_url, method="POST", body=json.dumps(data))
         res = yield client.fetch(req, raise_error=False)
-        print res.code
+        print(res.code)
         if res.code != 201 and res.code != 200:
-            print "res.code is %s. it's wrong" % res.code
+            print("res.code is %s. it's wrong" % res.code)
             raise gen.Return(False)
     raise gen.Return(True)
 
@@ -135,7 +135,7 @@ def add_webhook_event(username, repo_json, reponame, client, token, db):
         location_str = ''
         countrycode = ''
         company= ''
-    print 'city:%s' % city
+    print('city:%s' % city)
     sender = {
         'followers': sender_info_json['followers'],
         'sender_name': repo_json['sender']['login'],
