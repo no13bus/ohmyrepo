@@ -2,7 +2,6 @@
 use webhook to analysis automaticly that who stared your repository, where are they. Besides you can fellow some users. 
 
 ================
-[![repo](http://ohmyrepo.ml/static/ohmyrepo.png)](http://ohmyrepo.ml/show?u=no13bus&r=ohmyrepo)
 [中文文档](https://github.com/no13bus/ohmyrepo/blob/master/README_CN.md)
 
 ## Let's start
@@ -18,11 +17,6 @@ use webhook to analysis automaticly that who stared your repository, where are t
 - [Tornado](https://github.com/tornadoweb/tornado)
 - [Highchart](http://www.highcharts.com/)
 
-## Demo
-http://ohmyrepo.ml/show?u=no13bus&r=redispapa
-
-## Index
-http://ohmyrepo.ml
 
 ## Project Details
 - If you want to record your repository, you should login with github firstly. We need your authorization include repo's webhook reading and writing and user's following.
@@ -40,6 +34,9 @@ http://ohmyrepo.ml
 ![6](https://raw.githubusercontent.com/no13bus/ohmyrepo/master/screen/6.png)
 ![7](https://raw.githubusercontent.com/no13bus/ohmyrepo/master/screen/7.png)
 ![8](https://raw.githubusercontent.com/no13bus/ohmyrepo/master/screen/8.png)
+
+## Version 0.1
+- update framework to the new version. Python3.x tornado 6.x
 
 
 ## Version 0.0.2

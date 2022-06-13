@@ -1,7 +1,6 @@
 # ohmyrepo
 该项目利用了github的webhook功能，自动获取用户的repo的star信息，关注人的分布以及关注者的被follow的数量排名， 这样你可以选择直接follow他们。
 
-[![repo](http://ohmyrepo.ml/static/ohmyrepo.png)](http://ohmyrepo.ml/show?u=no13bus&r=ohmyrepo)
 ================
 
 ## 开始安装
@@ -17,11 +16,6 @@
 - [Tornado](https://github.com/tornadoweb/tornado)
 - [Highchart](http://www.highcharts.com/)
 
-## Demo
-http://ohmyrepo.ml/show?u=no13bus&r=redispapa
-
-## Index
-http://ohmyrepo.ml
 
 ## 项目细节
 - 首先，你需要使用github账户登录网站，ohmyrepo需要你的权限包括: follow read, follow write, webhook read, webhook write.

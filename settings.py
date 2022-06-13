@@ -16,8 +16,8 @@ settings['db'] = motor.MotorClient('localhost', 27017).ohmyrepo
 
 # github application settings
 githubapi = {}
-githubapi['CLIENT_ID'] =''
-githubapi['CLIENT_SECRET'] = ''
+githubapi['CLIENT_ID'] ='Iv1.c8b173e982d40fd4'
+githubapi['CLIENT_SECRET'] = 'de38efc439bd65363c6768c6fa6f7c694f746f91'
 githubapi['REDIRECT_URL'] = 'https://ohmyrepo.v2j.tech/callback'
 githubapi['ACCESS_TOKEN_URL'] = ''
 githubapi['STATE'] = ''
